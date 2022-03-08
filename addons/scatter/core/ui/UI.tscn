@@ -1,0 +1,49 @@
+[gd_scene load_steps=2 format=3 uid="uid://chagu7y4os4w4"]
+
+[ext_resource type="Script" path="res://addons/scatter/core/ui/UI.gd" id="1_w4s6f"]
+
+[node name="UI" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( "1_w4s6f" )
+brush_size_slider_path = NodePath("P/V/BrushSize/Slider")
+
+[node name="P" type="PanelContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_layout_mode": 0,
+"_edit_use_custom_anchors": false
+}
+
+[node name="V" type="VBoxContainer" parent="P"]
+offset_right = 1024.0
+offset_bottom = 600.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="BrushSize" type="HBoxContainer" parent="P/V"]
+offset_right = 1024.0
+offset_bottom = 26.0
+
+[node name="Label" type="Label" parent="P/V/BrushSize"]
+offset_right = 85.0
+offset_bottom = 26.0
+text = "Brush Size "
+
+[node name="Size" type="Label" parent="P/V/BrushSize"]
+rect_min_size = Vector2(40, 0)
+offset_left = 89.0
+offset_top = 1.0
+offset_right = 129.0
+offset_bottom = 24.0
+
+[node name="Slider" type="HSlider" parent="P/V/BrushSize"]
+offset_left = 133.0
+offset_right = 1024.0
+offset_bottom = 15.0
+size_flags_horizontal = 3
+min_value = 1.0
+value = 1.0
+tick_count = 1
+ticks_on_borders = true

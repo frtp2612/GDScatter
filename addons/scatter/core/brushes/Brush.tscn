@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://br87f5b3tf7ee"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_jlt0c"]
+
+[node name="Brush" type="MeshInstance3D"]
+mesh = SubResource( "SphereMesh_jlt0c" )
