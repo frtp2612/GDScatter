@@ -1,4 +1,3 @@
-@tool
 class_name ScatterMultimesh extends MultiMeshInstance3D
 
 
