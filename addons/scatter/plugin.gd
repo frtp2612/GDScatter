@@ -22,7 +22,7 @@ var editable_object : bool = true
 var drawing : bool = false
 
 var multimesh_settings = {
-	"max_instances": 10000,
+	"max_instances": 100000,
 	"current_instances": 200,
 	"randomized_amount": 20,
 }
@@ -32,7 +32,9 @@ var preview_multimesh
 var attraction = 0.1
 
 var active_scatter
-var active_multimesh
+var active_multimesh : ScatterMultimesh
+
+var scatter_multimeshes : Array = []
 
 func _handles(object) -> bool:
 	if object is Scatter:
@@ -40,6 +42,7 @@ func _handles(object) -> bool:
 		print(active_scatter)
 		if !active_scatter.tool:
 			active_scatter.set_tool(self)
+			scatter_multimeshes.append(active_multimesh)
 		edit_mode = true
 		brush.center.visible = true
 		return true
@@ -114,18 +117,29 @@ func user_input(event):
 
 func process_drawing():
 	if active_multimesh:
-		
-		var offset = active_multimesh.multimesh.instance_count
-		active_multimesh.multimesh.instance_count = active_multimesh.multimesh.instance_count + brush.preview.multimesh.instance_count
-		
 		for instance_index in multimesh_settings.current_instances:
 #		place_elements(active_multimesh)
-			var transform = brush.preview.multimesh.get_instance_transform(instance_index)
-			transform.origin = transform.origin + brush.center.position
-			active_multimesh.multimesh.set_instance_transform(instance_index + offset, transform)
+			var visible_instances = active_multimesh.instances_data.size()
+			
+			if instance_index + visible_instances < active_multimesh.multimesh.instance_count:
+				var instance_transform = brush.preview.multimesh.get_instance_transform(instance_index)
+				instance_transform.origin = instance_transform.origin + brush.center.position
+
+				add_instance_to_multimesh(instance_index + visible_instances, instance_transform)
+			else:
+				active_scatter.spawn_multimesh()
+				scatter_multimeshes.append(active_multimesh)
+#			active_multimesh.multimesh.set_instance_transform(instance_index, transform)
+#			active_multimesh.add_data(transform, instance_index)
 #	add instances to first multimesh
 #	if multimesh max instances is reached, create a new multimesh
 #	use current multimesh instance to add object to
+
+func add_instance_to_multimesh(instance_index, instance_transform):
+	if !active_multimesh.instances_data.has(instance_transform.origin):
+		active_multimesh.instances_data[instance_transform.origin] = instance_index
+		active_multimesh.multimesh.set_instance_transform(instance_index, instance_transform)
+#			active_multimesh.multimesh.visible_instance_count += 1
 
 func place_elements(multimesh_instance):
 	var position_range_start = 0
