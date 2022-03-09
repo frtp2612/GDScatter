@@ -41,10 +41,10 @@ func _set_brush_size(value):
 	if tool:
 		tool.brush.size = value
 		tool.brush.mesh.scale = Vector3.ONE * value
-		tool.process_drawing()
+#		tool.process_drawing()
 
 func _set_mesh_instances(value):
 	mesh_instances_label.text = str(value)
 	if tool:
 		tool.multimesh_settings.current_instances = value
-		tool.process_drawing()
+#		tool.process_drawing()

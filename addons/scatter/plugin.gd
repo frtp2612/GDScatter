@@ -29,8 +29,23 @@ var multimesh_settings = {
 
 var preview_multimesh
 
+var attraction = 0.1
+
+var active_scatter
+var active_multimesh
+
 func _handles(object) -> bool:
-	return editable_object
+	if object is Scatter:
+		active_scatter = object
+		print(active_scatter)
+		if !active_scatter.tool:
+			active_scatter.set_tool(self)
+		edit_mode = true
+		brush.center.visible = true
+		return true
+	edit_mode = false
+	brush.center.visible = false
+	return false
 
 func _forward_3d_gui_input(viewport_camera, event) -> bool:
 	if !edit_mode:
@@ -98,8 +113,16 @@ func user_input(event):
 	return false
 
 func process_drawing():
-	print("adding elements")
-	pass
+	if active_multimesh:
+		
+		var offset = active_multimesh.multimesh.instance_count
+		active_multimesh.multimesh.instance_count = active_multimesh.multimesh.instance_count + brush.preview.multimesh.instance_count
+		
+		for instance_index in multimesh_settings.current_instances:
+#		place_elements(active_multimesh)
+			var transform = brush.preview.multimesh.get_instance_transform(instance_index)
+			transform.origin = transform.origin + brush.center.position
+			active_multimesh.multimesh.set_instance_transform(instance_index + offset, transform)
 #	add instances to first multimesh
 #	if multimesh max instances is reached, create a new multimesh
 #	use current multimesh instance to add object to
@@ -107,20 +130,20 @@ func process_drawing():
 func place_elements(multimesh_instance):
 	var position_range_start = 0
 	var position_range_end = brush.size
-	var theta := 0
+	var theta : float = 0.0
 	
 	multimesh_instance.multimesh.instance_count = multimesh_settings.current_instances
+	
 	var center = brush.center.position
-
+	
 	for instance_index in multimesh_settings.current_instances:
 		randomize()
-		var x: float
-		var z: float
-		var theta_x = theta
-		var theta_z = theta
-		x = center.x + randf_range(position_range_start, position_range_end) * cos(theta_x)
-		z = center.z + randf_range(position_range_start, position_range_end) * sin(theta_z)
-		theta += 1
+		# angle of the point around the circle
+		
+		theta = randf() * 2.0 * PI
+		var point_distance_from_center : float = sqrt(randf()) * brush.size
+		var x = center.x + point_distance_from_center * cos(theta)
+		var z = center.z + point_distance_from_center * sin(theta)
 		var start_position = Vector3(x, 1000, z)
 		var target_position = get_projected_position(start_position)
 		var y = 0
@@ -162,6 +185,7 @@ func add_ui():
 		ui_sidebar.visible = true
 
 func _exit_tree():
+	remove_custom_type("Scatter")
 	remove_control_from_container(EditorPlugin.CONTAINER_PROPERTY_EDITOR_BOTTOM, ui_sidebar)
 	if ui_sidebar:
 		ui_sidebar.free()

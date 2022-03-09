@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://bw7nc6r7fkiff"]
+
+[ext_resource type="Script" path="res://addons/scatter/core/nodes/Scatter.gd" id="1_cumad"]
+
+[node name="Scatter" type="Node3D"]
+script = ExtResource( "1_cumad" )

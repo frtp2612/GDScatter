@@ -9,12 +9,18 @@
 config_version=5
 
 _global_script_classes=[{
+"base": "Node3D",
+"class": &"Scatter",
+"language": &"GDScript",
+"path": "res://addons/scatter/core/nodes/Scatter.gd"
+}, {
 "base": "MultiMeshInstance3D",
 "class": &"ScatterMultimesh",
 "language": &"GDScript",
-"path": "res://addons/scatter/src/nodes/ScatterMultimesh.gd"
+"path": "res://addons/scatter/core/nodes/ScatterMultimesh.gd"
 }]
 _global_script_class_icons={
+"Scatter": "",
 "ScatterMultimesh": ""
 }
 
@@ -22,7 +28,7 @@ _global_script_class_icons={
 
 config/name="Scatter"
 run/main_scene="res://addons/scatter/src/demo/Test.tscn"
-config/icon="res://icon.png"
+config/icon="res://addons/scatter/icon.png"
 config/features=PackedStringArray("4.0", "Vulkan Clustered")
 
 [editor_plugins]

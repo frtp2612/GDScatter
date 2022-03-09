@@ -1,5 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://ctw34s8ptt6rq"]
+[gd_scene load_steps=6 format=3 uid="uid://ctw34s8ptt6rq"]
 
+[ext_resource type="PackedScene" uid="uid://bw7nc6r7fkiff" path="res://addons/scatter/core/nodes/Scatter.tscn" id="2_bsrn7"]
 [ext_resource type="ArrayMesh" uid="uid://cc6yxskx2dri" path="res://addons/scatter/src/demo/assets/models/TerrainMesh.mesh" id="3_fkkrp"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t7l36"]
@@ -15,31 +16,13 @@ _data = {
 "tilts": PackedFloat32Array(0, 0, 0, 0, 0)
 }
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_bq5in"]
-sky_top_color = Color(0.443137, 0.780392, 0.858824, 1)
-sky_horizon_color = Color(0.72549, 0.737255, 0.752941, 1)
-
-[sub_resource type="Sky" id="Sky_rijfd"]
-sky_material = SubResource( "ProceduralSkyMaterial_bq5in" )
-
-[sub_resource type="Environment" id="Environment_veplw"]
-background_mode = 2
-sky = SubResource( "Sky_rijfd" )
-tonemap_mode = 2
-auto_exposure_enabled = true
-auto_exposure_min_luma = 0.36
-ssao_enabled = true
-sdfgi_enabled = true
-sdfgi_use_occlusion = true
-glow_enabled = true
-
 [node name="Node3D" type="Node3D"]
 __meta__ = {
 "_edit_lock_": true
 }
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
 material_override = SubResource( "StandardMaterial3D_t7l36" )
 mesh = ExtResource( "3_fkkrp" )
 
@@ -58,10 +41,12 @@ __meta__ = {
 [node name="Path3D" type="Path3D" parent="."]
 curve = SubResource( "Curve3D_ybqro" )
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource( "Environment_veplw" )
-
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.536446, 0.829669, -0.154519, 0, 0.183094, 0.983096, 0.843935, -0.527377, 0.0982197, 0, 10.7123, 0)
+transform = Transform3D(0.536446, 0.829668, -0.154519, 0, 0.183094, 0.983095, 0.843935, -0.527377, 0.0982201, 0, 35.8369, 0)
+light_energy = 2.5
 shadow_enabled = true
 shadow_color = Color(0.168627, 0.168627, 0.168627, 1)
+
+[node name="Scatter" parent="." instance=ExtResource( "2_bsrn7" )]
+
+[editable path="Scatter"]
