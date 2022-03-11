@@ -20,8 +20,8 @@ _global_script_classes=[{
 "path": "res://addons/scatter/src/core/nodes/ScatterMultimesh.gd"
 }]
 _global_script_class_icons={
-"Scatter": "res://addons/scatter/icons/scatter-icon.png",
-"ScatterMultimesh": "res://addons/scatter/icons/scatter-random-icon.png"
+"Scatter": "res://addons/scatter/src/icons/scatter-icon.png",
+"ScatterMultimesh": "res://addons/scatter/src/icons/scatter-random-icon.png"
 }
 
 [application]

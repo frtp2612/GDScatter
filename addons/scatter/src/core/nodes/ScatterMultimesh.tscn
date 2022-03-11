@@ -1,9 +1,0 @@
-[gd_scene load_steps=3 format=3]
-
-[ext_resource type="Script" path="res://addons/scatter/src/core/nodes/ScatterMultimesh.gd" id="1_o4nf5"]
-
-[sub_resource type="MultiMesh" id="MultiMesh_jtvn0"]
-
-[node name="ScatterMultimesh" type="MultiMeshInstance3D"]
-multimesh = SubResource( "MultiMesh_jtvn0" )
-script = ExtResource( "1_o4nf5" )

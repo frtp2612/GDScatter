@@ -38,6 +38,7 @@ var attraction = 0.1
 
 var active_scatter
 var active_multimesh : ScatterMultimesh
+var spawning_multimesh = false
 
 var current_mode = scatter_mode.LOCKED:
 	set(value):
@@ -58,6 +59,8 @@ func _handles(object) -> bool:
 	elif object is ScatterMultimesh:
 		# in this case you can only edit the selected multimesh
 		active_multimesh = object
+		active_scatter = active_multimesh.get_parent()
+		active_scatter.set_tool(self)
 		current_mode = scatter_mode.BOUND_EDIT
 		brush.center.change_mode(false)
 		brush.center.visible = true
@@ -143,7 +146,7 @@ func user_input(event):
 	return false
 
 func process_drawing():
-	if active_multimesh:
+	if active_multimesh and !spawning_multimesh:
 		if edit_mode():
 			add_elements()
 		elif delete_mode():
@@ -151,18 +154,19 @@ func process_drawing():
 
 func add_elements():
 	var visible_instances = active_multimesh.multimesh.visible_instance_count
-	
 	for instance_index in multimesh_settings.current_instances:
 		
 		if instance_index + visible_instances < active_multimesh.multimesh.instance_count:
 			var instance_transform = brush.preview.multimesh.get_instance_transform(instance_index)
 			instance_transform.origin = instance_transform.origin + brush.center.position
-
 			add_instance_to_multimesh(instance_index + visible_instances, instance_transform)
 		else:
+			spawning_multimesh = true
 			active_scatter.spawn_multimesh()
-#			active_multimesh.multimesh.set_instance_transform(instance_index, transform)
-#			active_multimesh.add_data(transform, instance_index)
+			# this break is necessary to allow the engine to process the change of active multimesh
+			# otherwise it will still detect that the visible instances are exceeding the max instance count
+			# and will add n new multimesh nodes
+			break
 
 func remove_elements():
 	var updated_multimesh = MultiMesh.new()
@@ -182,6 +186,7 @@ func remove_elements():
 	active_multimesh.multimesh = updated_multimesh
 
 func add_instance_to_multimesh(instance_index, instance_transform):
+	# this check is useful to avoid adding meshes in the same spot
 	if !active_multimesh.instances_data.has(instance_transform.origin):
 		active_multimesh.instances_data[instance_transform.origin] = instance_index
 		active_multimesh.multimesh.set_instance_transform(instance_index, instance_transform)
@@ -240,17 +245,17 @@ func _enter_tree():
 func add_ui():
 	if !ui_sidebar:
 		ui_sidebar = preload("./src/core/ui/UI.tscn").instantiate()
-#		add_control_to_bottom_panel(ui_sidebar, "sidebar")
-		add_control_to_dock(DOCK_SLOT_LEFT_UL, ui_sidebar)
-#		add_control_to_container(EditorPlugin.CONTAINER_PROPERTY_EDITOR_BOTTOM, ui_sidebar)
+		add_custom_type("Scatter", "Node3D", preload("./src/core/nodes/Scatter.gd"), preload("./src/icons/scatter-icon.png"))
+		add_custom_type("ScatterMultimesh", "MultimeshInstance3D", preload("./src/core/nodes/ScatterMultimesh.gd"), preload("./src/icons/scatter-random-icon.png"))
+		add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_UR, ui_sidebar)
 		ui_sidebar.set_tool(self)
 		ui_sidebar.visible = true
 
 func _exit_tree():
-#	remove_custom_type("Scatter")
-	remove_control_from_docks(ui_sidebar)
-#	remove_control_from_container(EditorPlugin.CONTAINER_PROPERTY_EDITOR_BOTTOM, ui_sidebar)
+	remove_custom_type("Scatter")
+	remove_custom_type("ScatterMultimesh")
 	if ui_sidebar:
+		remove_control_from_docks(ui_sidebar)
 		ui_sidebar.free()
 
 func edit_mode():
