@@ -1,6 +1,5 @@
-[gd_scene load_steps=6 format=3 uid="uid://ctw34s8ptt6rq"]
+[gd_scene load_steps=5 format=3 uid="uid://d3vrfint5v08m"]
 
-[ext_resource type="PackedScene" uid="uid://bw7nc6r7fkiff" path="res://addons/scatter/core/nodes/Scatter.tscn" id="2_bsrn7"]
 [ext_resource type="ArrayMesh" uid="uid://cc6yxskx2dri" path="res://addons/scatter/src/demo/assets/models/TerrainMesh.mesh" id="3_fkkrp"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t7l36"]
@@ -45,8 +44,3 @@ curve = SubResource( "Curve3D_ybqro" )
 transform = Transform3D(0.536446, 0.829668, -0.154519, 0, 0.183094, 0.983095, 0.843935, -0.527377, 0.0982201, 0, 35.8369, 0)
 light_energy = 2.5
 shadow_enabled = true
-shadow_color = Color(0.168627, 0.168627, 0.168627, 1)
-
-[node name="Scatter" parent="." instance=ExtResource( "2_bsrn7" )]
-
-[editable path="Scatter"]

@@ -1,7 +1,13 @@
 @tool
 extends EditorPlugin
 
-
+enum scatter_mode {
+	LOCKED,
+	FREE_EDIT,
+	BOUND_EDIT,
+	FREE_DELETE,
+	BOUND_DELETE
+}
 var ui_sidebar
 
 var brush = {
@@ -11,7 +17,6 @@ var brush = {
 	"preview": null
 }
 
-var edit_mode = true
 var raycast_info = {
 	"hit": false,
 	"hit_position": null,
@@ -34,24 +39,47 @@ var attraction = 0.1
 var active_scatter
 var active_multimesh : ScatterMultimesh
 
-var scatter_multimeshes : Array = []
+var current_mode = scatter_mode.LOCKED:
+	set(value):
+		current_mode = value
 
 func _handles(object) -> bool:
 	if object is Scatter:
+		# in this case you can only edit the latest created multimesh
 		active_scatter = object
-		print(active_scatter)
 		if !active_scatter.tool:
 			active_scatter.set_tool(self)
-			scatter_multimeshes.append(active_multimesh)
-		edit_mode = true
+			if active_scatter.get_child_count() > 0:
+				active_multimesh = active_scatter.get_child(0)
+		current_mode = scatter_mode.FREE_EDIT
+		brush.center.change_mode(false)
 		brush.center.visible = true
 		return true
-	edit_mode = false
+	elif object is ScatterMultimesh:
+		# in this case you can only edit the selected multimesh
+		active_multimesh = object
+		current_mode = scatter_mode.BOUND_EDIT
+		brush.center.change_mode(false)
+		brush.center.visible = true
+		return true
+	current_mode = scatter_mode.LOCKED
 	brush.center.visible = false
 	return false
 
-func _forward_3d_gui_input(viewport_camera, event) -> bool:
-	if !edit_mode:
+func _input(event):
+	if event is InputEventKey and event.pressed:
+		if event.keycode == KEY_Q:
+			if edit_mode():
+				current_mode = scatter_mode.BOUND_DELETE if current_mode == scatter_mode.BOUND_EDIT else scatter_mode.FREE_DELETE
+				brush.center.change_mode(true)
+				brush.preview.multimesh.visible_instance_count = 0
+			elif delete_mode():
+				current_mode = scatter_mode.BOUND_EDIT if current_mode == scatter_mode.BOUND_DELETE else scatter_mode.FREE_EDIT
+				brush.center.change_mode(false)
+				brush.preview.multimesh.visible_instance_count = multimesh_settings.current_instances
+
+func _forward_3d_gui_input(viewport_camera, event):
+	if !edit_mode() and !delete_mode():
 		return false
 	
 	display_brush()
@@ -82,11 +110,10 @@ func raycast(camera : Camera3D, event : InputEvent) -> void:
 		
 		#IF RAYCAST HITS A DRAWABLE SURFACE:
 		if hit:
-			if brush.preview:
+			if brush.preview and edit_mode():
 				place_elements(brush.preview)
 			raycast_info.hit = true
 			raycast_info.hit_position = hit.position
-#			print(raycast_info)
 			raycast_info.hit_normal = hit.normal
 		else:
 			raycast_info.hit = false
@@ -117,29 +144,48 @@ func user_input(event):
 
 func process_drawing():
 	if active_multimesh:
-		for instance_index in multimesh_settings.current_instances:
-#		place_elements(active_multimesh)
-			var visible_instances = active_multimesh.instances_data.size()
-			
-			if instance_index + visible_instances < active_multimesh.multimesh.instance_count:
-				var instance_transform = brush.preview.multimesh.get_instance_transform(instance_index)
-				instance_transform.origin = instance_transform.origin + brush.center.position
+		if edit_mode():
+			add_elements()
+		elif delete_mode():
+			remove_elements()
 
-				add_instance_to_multimesh(instance_index + visible_instances, instance_transform)
-			else:
-				active_scatter.spawn_multimesh()
-				scatter_multimeshes.append(active_multimesh)
+func add_elements():
+	var visible_instances = active_multimesh.multimesh.visible_instance_count
+	
+	for instance_index in multimesh_settings.current_instances:
+		
+		if instance_index + visible_instances < active_multimesh.multimesh.instance_count:
+			var instance_transform = brush.preview.multimesh.get_instance_transform(instance_index)
+			instance_transform.origin = instance_transform.origin + brush.center.position
+
+			add_instance_to_multimesh(instance_index + visible_instances, instance_transform)
+		else:
+			active_scatter.spawn_multimesh()
 #			active_multimesh.multimesh.set_instance_transform(instance_index, transform)
 #			active_multimesh.add_data(transform, instance_index)
-#	add instances to first multimesh
-#	if multimesh max instances is reached, create a new multimesh
-#	use current multimesh instance to add object to
+
+func remove_elements():
+	var updated_multimesh = MultiMesh.new()
+	updated_multimesh.transform_format = MultiMesh.TRANSFORM_3D
+	updated_multimesh.mesh = active_multimesh.multimesh.mesh
+	updated_multimesh.instance_count = active_multimesh.multimesh.instance_count
+
+	var index = 0
+	for instance_index in active_multimesh.multimesh.visible_instance_count:
+		var transform = active_multimesh.multimesh.get_instance_transform(instance_index)
+		if Vector2(transform.origin.x, transform.origin.z).distance_to(Vector2(brush.center.position.x, brush.center.position.z)) > brush.size:
+			updated_multimesh.set_instance_transform(index, transform)
+			index += 1
+	updated_multimesh.visible_instance_count = index
+	updated_multimesh.set_local_to_scene(true)
+	updated_multimesh.setup_local_to_scene()
+	active_multimesh.multimesh = updated_multimesh
 
 func add_instance_to_multimesh(instance_index, instance_transform):
 	if !active_multimesh.instances_data.has(instance_transform.origin):
 		active_multimesh.instances_data[instance_transform.origin] = instance_index
 		active_multimesh.multimesh.set_instance_transform(instance_index, instance_transform)
-#			active_multimesh.multimesh.visible_instance_count += 1
+		active_multimesh.multimesh.visible_instance_count += 1
 
 func place_elements(multimesh_instance):
 	var position_range_start = 0
@@ -174,6 +220,7 @@ func place_elements(multimesh_instance):
 		rotated(Vector3.FORWARD, randf_range(-horizontal_rotation, horizontal_rotation))
 		transform.origin = Vector3(x - center.x, y - center.y, z - center.z)
 		multimesh_instance.multimesh.set_instance_transform(instance_index, transform)
+	
 
 func get_projected_position(ray_start):
 	var ray_end = Vector3(ray_start.x, ray_start.y-10000, ray_start.z)
@@ -184,7 +231,7 @@ func get_projected_position(ray_start):
 
 func _enter_tree():
 	add_ui()
-	var brush_scene = preload("./core/brushes/Brush.tscn").instantiate()
+	var brush_scene = preload("./src/core/brushes/Brush.tscn").instantiate()
 	brush.center = brush_scene
 	add_child(brush.center)
 	brush.mesh = brush.center.brush_area
@@ -192,14 +239,22 @@ func _enter_tree():
 
 func add_ui():
 	if !ui_sidebar:
-		ui_sidebar = preload("./core/ui/UI.tscn").instantiate()
+		ui_sidebar = preload("./src/core/ui/UI.tscn").instantiate()
 #		add_control_to_bottom_panel(ui_sidebar, "sidebar")
-		add_control_to_container(EditorPlugin.CONTAINER_PROPERTY_EDITOR_BOTTOM, ui_sidebar)
+		add_control_to_dock(DOCK_SLOT_LEFT_UL, ui_sidebar)
+#		add_control_to_container(EditorPlugin.CONTAINER_PROPERTY_EDITOR_BOTTOM, ui_sidebar)
 		ui_sidebar.set_tool(self)
 		ui_sidebar.visible = true
 
 func _exit_tree():
-	remove_custom_type("Scatter")
-	remove_control_from_container(EditorPlugin.CONTAINER_PROPERTY_EDITOR_BOTTOM, ui_sidebar)
+#	remove_custom_type("Scatter")
+	remove_control_from_docks(ui_sidebar)
+#	remove_control_from_container(EditorPlugin.CONTAINER_PROPERTY_EDITOR_BOTTOM, ui_sidebar)
 	if ui_sidebar:
 		ui_sidebar.free()
+
+func edit_mode():
+	return current_mode == scatter_mode.FREE_EDIT or current_mode == scatter_mode.BOUND_EDIT
+
+func delete_mode():
+	return current_mode == scatter_mode.FREE_DELETE or current_mode == scatter_mode.BOUND_DELETE

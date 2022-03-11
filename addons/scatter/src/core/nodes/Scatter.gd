@@ -1,12 +1,12 @@
 @tool
-class_name Scatter extends Node3D
+class_name Scatter, "res://addons/scatter/icons/scatter-icon.png" extends Node3D
 
 var tool
 var active_multimesh : ScatterMultimesh
 var scatter_multimesh
 
 func _enter_tree():
-	scatter_multimesh = preload("res://addons/scatter/core/nodes/ScatterMultimesh.tscn")
+	scatter_multimesh = preload("./ScatterMultimesh.tscn")
 
 func _ready():
 	pass # Replace with function body.
@@ -24,9 +24,12 @@ func spawn_multimesh():
 	active_multimesh.multimesh.mesh = tool.brush.preview.multimesh.mesh
 	active_multimesh.material_override = tool.brush.preview.material_override
 	active_multimesh.multimesh.instance_count = tool.multimesh_settings.max_instances
-	active_multimesh.multimesh.visible_instance_count = -1
+	active_multimesh.multimesh.visible_instance_count = 0
+	active_multimesh.multimesh.set_local_to_scene(true)
+	active_multimesh.multimesh.setup_local_to_scene()
 	tool.active_multimesh = active_multimesh
 
 func set_tool(_tool):
 	tool = _tool
-	spawn_multimesh()
+	if get_child_count() == 0:
+		spawn_multimesh()

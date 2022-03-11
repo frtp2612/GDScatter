@@ -1,12 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://br87f5b3tf7ee"]
+[gd_scene load_steps=8 format=3]
 
-[ext_resource type="Script" path="res://addons/scatter/core/brushes/Brush.gd" id="1_qpcua"]
+[ext_resource type="Script" path="res://addons/scatter/src/core/brushes/Brush.gd" id="1_qpcua"]
+[ext_resource type="Material" path="res://addons/scatter/src/core/brushes/DeleteBrush.tres" id="2_7xmvm"]
 [ext_resource type="Shader" path="res://addons/scatter/src/demo/Grass.gdshader" id="2_nqjxy"]
 [ext_resource type="ArrayMesh" uid="uid://chy4iccsp2spp" path="res://addons/scatter/src/demo/assets/models/GrassMesh.tres" id="2_qinfm"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jx72o"]
-transparency = 1
-albedo_color = Color(0.356863, 0.819608, 1, 0.0313726)
 
 [sub_resource type="SphereMesh" id="SphereMesh_jlt0c"]
 
@@ -36,7 +33,7 @@ brush_node_path = NodePath("Brush")
 multi_mesh_node_path = NodePath("MultiMeshPreview")
 
 [node name="Brush" type="MeshInstance3D" parent="."]
-material_override = SubResource( "StandardMaterial3D_jx72o" )
+material_override = ExtResource( "2_7xmvm" )
 mesh = SubResource( "SphereMesh_jlt0c" )
 
 [node name="MultiMeshPreview" type="MultiMeshInstance3D" parent="."]
