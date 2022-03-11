@@ -17,7 +17,8 @@ func _process(delta):
 
 func spawn_multimesh():
 	active_multimesh = scatter_multimesh.instantiate()
-	self.add_child(active_multimesh)
+	add_child(active_multimesh)
+	active_multimesh.set_owner(get_tree().get_edited_scene_root())
 	active_multimesh.multimesh = MultiMesh.new()
 	active_multimesh.multimesh.transform_format = MultiMesh.TRANSFORM_3D
 	active_multimesh.multimesh.mesh = tool.brush.preview.multimesh.mesh
