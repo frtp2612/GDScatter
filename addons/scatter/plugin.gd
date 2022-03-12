@@ -155,42 +155,34 @@ func process_drawing():
 func add_elements():
 	var visible_instances = active_multimesh.multimesh.visible_instance_count
 	for instance_index in multimesh_settings.current_instances:
-		
-		if instance_index + visible_instances < active_multimesh.multimesh.instance_count:
-			var instance_transform = brush.preview.multimesh.get_instance_transform(instance_index)
-			instance_transform.origin = instance_transform.origin + brush.center.position
-			add_instance_to_multimesh(instance_index + visible_instances, instance_transform)
-		else:
-			spawning_multimesh = true
-			active_scatter.spawn_multimesh()
-			# this break is necessary to allow the engine to process the change of active multimesh
-			# otherwise it will still detect that the visible instances are exceeding the max instance count
-			# and will add n new multimesh nodes
-			break
+		var instance_transform = brush.preview.multimesh.get_instance_transform(instance_index)
+		if !active_multimesh.existing_instances_data.has(instance_transform.origin):
+			if instance_index + visible_instances < active_multimesh.multimesh.instance_count:
+				instance_transform.origin = instance_transform.origin + brush.center.position
+				add_instance_to_multimesh(instance_index + visible_instances, instance_transform)
+			elif !active_multimesh.deleted_instances_data.is_empty():
+				var available_index = active_multimesh.deleted_instances_data.pop_front()
+				add_instance_to_multimesh(available_index, instance_transform)
+			else:
+				if !bound_edit():
+					spawning_multimesh = true
+					active_scatter.spawn_multimesh()
+					# this break is necessary to allow the engine to process the change of active multimesh
+					# otherwise it will still detect that the visible instances are exceeding the max instance count
+					# and will add n new multimesh nodes
+					break
 
 func remove_elements():
-	var updated_multimesh = MultiMesh.new()
-	updated_multimesh.transform_format = MultiMesh.TRANSFORM_3D
-	updated_multimesh.mesh = active_multimesh.multimesh.mesh
-	updated_multimesh.instance_count = active_multimesh.multimesh.instance_count
-
-	var index = 0
 	for instance_index in active_multimesh.multimesh.visible_instance_count:
 		var transform = active_multimesh.multimesh.get_instance_transform(instance_index)
-		if Vector2(transform.origin.x, transform.origin.z).distance_to(Vector2(brush.center.position.x, brush.center.position.z)) > brush.size:
-			updated_multimesh.set_instance_transform(index, transform)
-			index += 1
-	updated_multimesh.visible_instance_count = index
-	updated_multimesh.set_local_to_scene(true)
-	updated_multimesh.setup_local_to_scene()
-	active_multimesh.multimesh = updated_multimesh
+		if Vector2(transform.origin.x, transform.origin.z).distance_to(Vector2(brush.center.position.x, brush.center.position.z)) <= brush.size:
+			active_multimesh.set_instance_transform(instance_index, Transform3D())
+			active_multimesh.deleted_instances_data.push_back(instance_index)
 
 func add_instance_to_multimesh(instance_index, instance_transform):
-	# this check is useful to avoid adding meshes in the same spot
-	if !active_multimesh.instances_data.has(instance_transform.origin):
-		active_multimesh.instances_data[instance_transform.origin] = instance_index
-		active_multimesh.multimesh.set_instance_transform(instance_index, instance_transform)
-		active_multimesh.multimesh.visible_instance_count += 1
+	active_multimesh.existing_instances_data[instance_transform.origin] = instance_index
+	active_multimesh.multimesh.set_instance_transform(instance_index, instance_transform)
+	active_multimesh.multimesh.visible_instance_count += 1
 
 func place_elements(multimesh_instance):
 	var position_range_start = 0
@@ -260,6 +252,9 @@ func _exit_tree():
 
 func edit_mode():
 	return current_mode == scatter_mode.FREE_EDIT or current_mode == scatter_mode.BOUND_EDIT
+
+func bound_edit():
+	return current_mode == scatter_mode.BOUND_EDIT
 
 func delete_mode():
 	return current_mode == scatter_mode.FREE_DELETE or current_mode == scatter_mode.BOUND_DELETE
