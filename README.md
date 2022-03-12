@@ -4,8 +4,8 @@
 Scatter is a plugin for the Godot game engine.
 In particular it was developed for and with Godot version 4.
 
-To use this plugin, simply copy the contents in the addons folder into your poject, in your addons folder.
-Copy the addons folder directly or create one in case you are not using any other addons yet.
+To use this plugin, simply copy the contents in the scatter folder, in your addons folder.
+Copy the addons folder directly from here or create one in case you are not using any other addons yet.
 
 # What can scatter do?
 - [x] You can place large amounts of objects without major losses in performance.
