@@ -22,6 +22,8 @@ func spawn_multimesh():
 	active_multimesh.multimesh = MultiMesh.new()
 	active_multimesh.multimesh.transform_format = MultiMesh.TRANSFORM_3D
 	active_multimesh.multimesh.mesh = tool.brush.preview.multimesh.mesh
+	active_multimesh.multimesh.mesh.set_local_to_scene(true)
+	active_multimesh.multimesh.mesh.setup_local_to_scene()
 	active_multimesh.material_override = tool.brush.preview.material_override
 	active_multimesh.multimesh.instance_count = tool.multimesh_settings.max_instances
 	active_multimesh.multimesh.visible_instance_count = 0

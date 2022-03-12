@@ -8,13 +8,15 @@ enum scatter_mode {
 	FREE_DELETE,
 	BOUND_DELETE
 }
+
 var ui_sidebar
 
 var brush = {
 	"center": null,
 	"mesh": null,
 	"size": 1,
-	"preview": null
+	"preview": null,
+	"hardness": 1
 }
 
 var raycast_info = {
@@ -23,7 +25,6 @@ var raycast_info = {
 	"hit_normal": null
 }
 
-var editable_object : bool = true
 var drawing : bool = false
 
 var multimesh_settings = {
@@ -31,10 +32,6 @@ var multimesh_settings = {
 	"current_instances": 200,
 	"randomized_amount": 20,
 }
-
-var preview_multimesh
-
-var attraction = 0.1
 
 var active_scatter
 var active_multimesh : ScatterMultimesh
@@ -154,11 +151,11 @@ func process_drawing():
 
 func add_elements():
 	var visible_instances = active_multimesh.multimesh.visible_instance_count
-	for instance_index in multimesh_settings.current_instances:
+	for instance_index in multimesh_settings.current_instances * brush.hardness:
 		var instance_transform = brush.preview.multimesh.get_instance_transform(instance_index)
 		if !active_multimesh.existing_instances_data.has(instance_transform.origin):
+			instance_transform.origin = instance_transform.origin + brush.center.position
 			if instance_index + visible_instances < active_multimesh.multimesh.instance_count:
-				instance_transform.origin = instance_transform.origin + brush.center.position
 				add_instance_to_multimesh(instance_index + visible_instances, instance_transform)
 			elif !active_multimesh.deleted_instances_data.is_empty():
 				var available_index = active_multimesh.deleted_instances_data.pop_front()
@@ -173,16 +170,21 @@ func add_elements():
 					break
 
 func remove_elements():
-	for instance_index in active_multimesh.multimesh.visible_instance_count:
-		var transform = active_multimesh.multimesh.get_instance_transform(instance_index)
-		if Vector2(transform.origin.x, transform.origin.z).distance_to(Vector2(brush.center.position.x, brush.center.position.z)) <= brush.size:
-			active_multimesh.set_instance_transform(instance_index, Transform3D())
+	for instance_origin in active_multimesh.existing_instances_data.keys():
+		var instance_index = active_multimesh.existing_instances_data[instance_origin]
+		if Vector2(instance_origin.x, instance_origin.z).distance_to(Vector2(brush.center.position.x, brush.center.position.z)) <= brush.size:
+			active_multimesh.multimesh.set_instance_transform(instance_index, Transform3D())
 			active_multimesh.deleted_instances_data.push_back(instance_index)
+			active_multimesh.existing_instances_data.erase(instance_origin)
+	if active_multimesh.existing_instances_data.is_empty() and active_scatter.get_child_count() > 1:
+		active_multimesh.free()
+		active_multimesh = null
 
 func add_instance_to_multimesh(instance_index, instance_transform):
 	active_multimesh.existing_instances_data[instance_transform.origin] = instance_index
 	active_multimesh.multimesh.set_instance_transform(instance_index, instance_transform)
-	active_multimesh.multimesh.visible_instance_count += 1
+	if active_multimesh.multimesh.visible_instance_count < active_multimesh.multimesh.instance_count:
+		active_multimesh.multimesh.visible_instance_count += 1
 
 func place_elements(multimesh_instance):
 	var position_range_start = 0
@@ -195,13 +197,11 @@ func place_elements(multimesh_instance):
 	
 	for instance_index in multimesh_settings.current_instances:
 		randomize()
-		# angle of the point around the circle
-		
 		theta = randf() * 2.0 * PI
 		var point_distance_from_center : float = sqrt(randf()) * brush.size
 		var x = center.x + point_distance_from_center * cos(theta)
 		var z = center.z + point_distance_from_center * sin(theta)
-		var start_position = Vector3(x, 1000, z)
+		var start_position = Vector3(x, 10000, z)
 		var target_position = get_projected_position(start_position)
 		var y = 0
 
@@ -220,7 +220,7 @@ func place_elements(multimesh_instance):
 	
 
 func get_projected_position(ray_start):
-	var ray_end = Vector3(ray_start.x, ray_start.y-10000, ray_start.z)
+	var ray_end = Vector3(ray_start.x, ray_start.y-100000, ray_start.z)
 	var result = raycast_from_vert(ray_start, ray_end)
 	if result:
 		return result.position

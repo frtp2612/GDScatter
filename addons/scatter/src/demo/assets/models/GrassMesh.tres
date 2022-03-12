@@ -16,6 +16,7 @@ _surfaces = [{
 blend_shape_mode = 0
 
 [resource]
+resource_local_to_scene = true
 resource_name = "grass_Plane007"
 _surfaces = [{
 "aabb": AABB(-0.241026, -0.0479134, -0.241045, 0.462653, 0.833637, 0.39078),

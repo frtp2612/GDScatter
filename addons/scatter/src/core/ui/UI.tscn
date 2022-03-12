@@ -1,16 +1,6 @@
-[gd_scene load_steps=6 format=3 uid="uid://bgokjio5rurre"]
+[gd_scene load_steps=2 format=3 uid="uid://bgokjio5rurre"]
 
 [ext_resource type="Script" path="res://addons/scatter/src/core/ui/UI.gd" id="1_7cyug"]
-
-[sub_resource type="BoxMesh" id="BoxMesh_mptes"]
-
-[sub_resource type="MeshTexture" id="MeshTexture_30axk"]
-mesh = SubResource( "BoxMesh_mptes" )
-
-[sub_resource type="Gradient" id="Gradient_510wo"]
-
-[sub_resource type="GradientTexture2D" id="GradientTexture2D_gc21c"]
-gradient = SubResource( "Gradient_510wo" )
 
 [node name="UI" type="PanelContainer"]
 anchor_right = 1.0
@@ -23,6 +13,8 @@ __meta__ = {
 brush_size_slider_path = NodePath("V/BrushSize/Slider")
 mesh_instances_slider_path = NodePath("V/MeshInstances/Slider")
 brush_hardness_slider_path = NodePath("V/BrushHardness/Slider")
+add_mesh_button_path = NodePath("V/V/Button")
+mesh_list_path = NodePath("V/V/S/MeshList")
 
 [node name="V" type="VBoxContainer" parent="."]
 offset_right = 1024.0
@@ -130,35 +122,26 @@ value = 1.0
 tick_count = 1
 ticks_on_borders = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="V"]
+[node name="V" type="VBoxContainer" parent="V"]
 offset_top = 90.0
 offset_right = 1024.0
 offset_bottom = 189.0
 
-[node name="ScrollContainer" type="ScrollContainer" parent="V/VBoxContainer"]
+[node name="S" type="ScrollContainer" parent="V/V"]
 offset_right = 1024.0
 offset_bottom = 64.0
 vertical_scroll_mode = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="V/VBoxContainer/ScrollContainer"]
+[node name="MeshList" type="ItemList" parent="V/V/S"]
 rect_min_size = Vector2(0, 64)
 offset_right = 1024.0
 offset_bottom = 64.0
 size_flags_horizontal = 3
+auto_height = true
+max_columns = 5
+same_column_width = true
 
-[node name="TextureButton" type="TextureButton" parent="V/VBoxContainer/ScrollContainer/HBoxContainer"]
-rect_min_size = Vector2(64, 64)
-offset_right = 64.0
-offset_bottom = 64.0
-texture_normal = SubResource( "MeshTexture_30axk" )
-
-[node name="TextureRect" type="TextureRect" parent="V/VBoxContainer/ScrollContainer/HBoxContainer"]
-offset_left = 68.0
-offset_right = 132.0
-offset_bottom = 64.0
-texture = SubResource( "GradientTexture2D_gc21c" )
-
-[node name="Button" type="Button" parent="V/VBoxContainer"]
+[node name="Button" type="Button" parent="V/V"]
 offset_top = 68.0
 offset_right = 1024.0
 offset_bottom = 99.0
