@@ -1,9 +1,0 @@
-[gd_scene load_steps=3 format=3 uid="uid://b3i2ao3xobywq"]
-
-[ext_resource type="PackedScene" uid="uid://bwjfgc5heqky7" path="res://addons/scatter/src/demo/assets/models/Terrain.gltf" id="1_e5s0v"]
-[ext_resource type="ArrayMesh" uid="uid://cc6yxskx2dri" path="res://addons/scatter/src/demo/assets/models/TerrainMesh.mesh" id="2_exgxo"]
-
-[node name="Terrain" instance=ExtResource( "1_e5s0v" )]
-
-[node name="Plane" parent="." index="0"]
-mesh = ExtResource( "2_exgxo" )
