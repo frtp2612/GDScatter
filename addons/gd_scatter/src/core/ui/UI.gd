@@ -24,6 +24,8 @@ var add_mesh_button
 @export_node_path(HBoxContainer) var mesh_list_path
 var mesh_list : ItemList
 
+var global_state : GDScatterState
+
 func _enter_tree():
 	brush_size_label = get_node("V/BrushSize/H/Size")
 	brush_size_slider = get_node(brush_size_slider_path)
@@ -61,6 +63,9 @@ func set_tool(_tool):
 	tool = _tool
 	preview_visualizer = tool.get_editor_interface().get_resource_previewer()
 
+func set_state(state : GDScatterState):
+	global_state = state
+
 func _input(event):
 	if event is InputEventKey and event.pressed:
 		if event.keycode == KEY_W:
@@ -72,19 +77,19 @@ func _input(event):
 
 func _set_brush_size(value):
 	brush_size_label.text = str(value)
-	if tool:
-		tool.brush.size = value
-		tool.brush.mesh.scale = Vector3.ONE * value
+	if global_state:
+		global_state.brush.size = value
+		global_state.brush.node.scale = Vector3.ONE * value
 
 func _set_mesh_instances(value):
 	mesh_instances_label.text = str(value)
-	if tool:
-		tool.multimesh_settings.current_instances = value
+	if global_state:
+		global_state.multimesh_settings.current_instances = value
 
 func _set_brush_hardness(value):
 	brush_hardness_label.text = str(value)
-	if tool:
-		tool.brush.hardness = value
+	if global_state:
+		global_state.brush.hardness = value
 
 func _show_importer():
 	file_dialog.show()

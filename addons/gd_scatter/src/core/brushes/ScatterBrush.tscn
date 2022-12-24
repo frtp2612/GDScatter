@@ -1,0 +1,19 @@
+[gd_scene load_steps=4 format=3 uid="uid://dwrhotqaltmit"]
+
+[ext_resource type="Script" path="res://addons/gd_scatter/src/core/brushes/GDScatterBrush.gd" id="1_xxfha"]
+[ext_resource type="Material" uid="uid://c7d13bdhxlaux" path="res://addons/gd_scatter/src/core/brushes/EditBrush.tres" id="2_xkwyh"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_holr5"]
+material = ExtResource("2_xkwyh")
+height = 0.5
+is_hemisphere = true
+
+[node name="ScatterBrush" type="Node3D"]
+script = ExtResource("1_xxfha")
+brush_node_path = NodePath("Area")
+preview_node_path = NodePath("Preview")
+
+[node name="Area" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_holr5")
+
+[node name="Preview" type="MultiMeshInstance3D" parent="."]
