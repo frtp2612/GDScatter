@@ -19,6 +19,8 @@ func _enter_tree():
 func set_state(state: GDScatterState) -> void:
 	global_state = state
 	global_state.mode_changed.connect(change_mode)
+	print(global_state.multimesh_settings.current_instances)
+	preview_area.multimesh.instance_count = global_state.multimesh_settings.current_instances
 
 func change_mode() -> void:
 	pass

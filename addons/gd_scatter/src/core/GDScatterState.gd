@@ -18,6 +18,7 @@ var drawing : bool = false
 var active_area: GDScatterArea
 var active_section : GDScatterSection
 var spawning_section = false
+var space_state
 
 var multimesh_settings = {
 	"max_instances": 100000,
@@ -30,11 +31,13 @@ func initialize_as_area(scatter_area: GDScatterArea):
 	active_area.set_state(self)
 	if active_area.get_child_count() > 0:
 		active_section = active_area.get_child(0)
+		active_section.set_state(self)
 	active_mode = GDScatterMode.EDIT
 	brush.node.visible = true
 
-func initialize_as_sector(scatter_section: GDScatterSection):
+func initialize_as_section(scatter_section: GDScatterSection):
 	active_section = scatter_section
+	active_section.set_state(self)
 	active_area = active_section.get_parent()
 	active_area.set_state(self)
 	active_mode = GDScatterMode.EDIT
@@ -42,8 +45,10 @@ func initialize_as_sector(scatter_section: GDScatterSection):
 
 func initialize_brush(brush_node: GDBrush) -> void:
 	brush.node = brush_node
+	brush.node.set_state(self)
 
 func hide_scatter() -> void:
+	active_mode = GDScatterMode.NONE
 	brush.node.visible = false
 
 func edit_mode() -> bool:

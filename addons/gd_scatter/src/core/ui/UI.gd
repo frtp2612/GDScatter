@@ -79,12 +79,13 @@ func _set_brush_size(value):
 	brush_size_label.text = str(value)
 	if global_state:
 		global_state.brush.size = value
-		global_state.brush.node.scale = Vector3.ONE * value
+		global_state.brush.node.influence_area.scale = Vector3.ONE * value
 
 func _set_mesh_instances(value):
 	mesh_instances_label.text = str(value)
 	if global_state:
 		global_state.multimesh_settings.current_instances = value
+		global_state.brush.node.preview_area.multimesh.instance_count = value
 
 func _set_brush_hardness(value):
 	brush_hardness_label.text = str(value)

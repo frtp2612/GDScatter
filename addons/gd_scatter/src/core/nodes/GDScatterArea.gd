@@ -17,10 +17,11 @@ func spawn_section():
 	scatter_section.name = "ScatterSection" + str(global_state.active_area.get_child_count())
 	scatter_section.multimesh = MultiMesh.new()
 	scatter_section.multimesh.transform_format = MultiMesh.TRANSFORM_3D
-	scatter_section.multimesh.mesh = global_state.brush.preview.multimesh.mesh
+	scatter_section.multimesh.use_custom_data = true
+	scatter_section.multimesh.mesh = global_state.brush.node.preview_area.multimesh.mesh
 	scatter_section.multimesh.mesh.set_local_to_scene(true)
 	scatter_section.multimesh.mesh.setup_local_to_scene()
-	scatter_section.material_override = global_state.brush.preview.material_override
+	scatter_section.material_override = global_state.brush.node.preview_area.material_override
 	scatter_section.multimesh.instance_count = global_state.multimesh_settings.max_instances
 	scatter_section.multimesh.visible_instance_count = 0
 	scatter_section.multimesh.set_local_to_scene(true)
