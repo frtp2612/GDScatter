@@ -1,14 +1,6 @@
 @tool
 extends EditorPlugin
 
-enum scatter_mode {
-	LOCKED,
-	FREE_EDIT,
-	BOUND_EDIT,
-	FREE_DELETE,
-	BOUND_DELETE
-}
-
 var ui_sidebar
 
 var brush = {
@@ -37,7 +29,7 @@ var active_scatter
 var active_multimesh : GDScatterMultimesh
 var spawning_multimesh = false
 
-var current_mode = scatter_mode.LOCKED:
+var current_mode = GDScatterMode.LOCKED:
 	set(value):
 		current_mode = value
 
@@ -49,32 +41,37 @@ func _handles(object) -> bool:
 			active_scatter.set_tool(self)
 			if active_scatter.get_child_count() > 0:
 				active_multimesh = active_scatter.get_child(0)
-		current_mode = scatter_mode.FREE_EDIT
+		current_mode = GDScatterMode.FREE_EDIT
 		brush.center.change_mode(false)
 		brush.center.visible = true
+		return true
+	elif object is GDScatterArea:
+		# in this case you can only edit the selected area
+		object.activate(self)
 		return true
 	elif object is GDScatterMultimesh:
 		# in this case you can only edit the selected multimesh
 		active_multimesh = object
 		active_scatter = active_multimesh.get_parent()
-		active_scatter.set_tool(self)
-		current_mode = scatter_mode.BOUND_EDIT
+		active_scatter.activate(self)
+		current_mode = GDScatterMode.BOUND_EDIT
 		brush.center.change_mode(false)
 		brush.center.visible = true
 		return true
-	current_mode = scatter_mode.LOCKED
+	current_mode = GDScatterMode.LOCKED
 	brush.center.visible = false
+	active_scatter = null
 	return false
 
 func _input(event):
-	if event is InputEventKey and event.pressed:
+	if active_scatter and event is InputEventKey and event.pressed:
 		if event.keycode == KEY_Q:
 			if edit_mode():
-				current_mode = scatter_mode.BOUND_DELETE if current_mode == scatter_mode.BOUND_EDIT else scatter_mode.FREE_DELETE
+				current_mode = GDScatterMode.BOUND_DELETE if current_mode == GDScatterMode.BOUND_EDIT else GDScatterMode.FREE_DELETE
 				brush.center.change_mode(true)
 				brush.preview.multimesh.visible_instance_count = 0
 			elif delete_mode():
-				current_mode = scatter_mode.BOUND_EDIT if current_mode == scatter_mode.BOUND_DELETE else scatter_mode.FREE_EDIT
+				current_mode = GDScatterMode.BOUND_EDIT if current_mode == GDScatterMode.BOUND_DELETE else GDScatterMode.FREE_EDIT
 				brush.center.change_mode(false)
 				brush.preview.multimesh.visible_instance_count = multimesh_settings.current_instances
 
@@ -240,6 +237,7 @@ func add_ui():
 		ui_sidebar = preload("./src/core/ui/UI.tscn").instantiate()
 		add_custom_type("GDScatter", "Node3D", preload("./src/core/nodes/GDScatter.gd"), preload("./src/icons/scatter-icon.png"))
 		add_custom_type("GDScatterMultimesh", "MultimeshInstance3D", preload("./src/core/nodes/GDScatterMultimesh.gd"), preload("./src/icons/scatter-random-icon.png"))
+		add_custom_type("GDScatterArea", "Node3D", preload("./src/core/nodes/GDScatterArea.gd"), preload("./src/icons/scatter-icon.png"))
 		add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_UR, ui_sidebar)
 		ui_sidebar.set_tool(self)
 		ui_sidebar.visible = true
@@ -247,6 +245,7 @@ func add_ui():
 func _exit_tree():
 	remove_custom_type("GDScatter")
 	remove_custom_type("GDScatterMultimesh")
+	remove_custom_type("GDScatterArea")
 	if ui_sidebar:
 		remove_control_from_docks(ui_sidebar)
 		ui_sidebar.free()
@@ -257,10 +256,10 @@ func _hide_tool():
 		ui_sidebar.free()
 
 func edit_mode():
-	return current_mode == scatter_mode.FREE_EDIT or current_mode == scatter_mode.BOUND_EDIT
+	return current_mode == GDScatterMode.FREE_EDIT or current_mode == GDScatterMode.BOUND_EDIT
 
 func bound_edit():
-	return current_mode == scatter_mode.BOUND_EDIT
+	return current_mode == GDScatterMode.BOUND_EDIT
 
 func delete_mode():
-	return current_mode == scatter_mode.FREE_DELETE or current_mode == scatter_mode.BOUND_DELETE
+	return current_mode == GDScatterMode.FREE_DELETE or current_mode == GDScatterMode.BOUND_DELETE

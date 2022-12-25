@@ -1,5 +1,6 @@
 @tool
-class_name GDScatter, "res://addons/gd_scatter/src/icons/scatter-icon.png" extends Node3D
+class_name GDScatter extends Node3D
+@icon("res://addons/gd_scatter/src/icons/scatter-icon.png")
 
 var tool
 var active_multimesh : GDScatterMultimesh

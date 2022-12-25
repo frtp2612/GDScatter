@@ -8,8 +8,8 @@ uniform float twist = 1;
 uniform float mask_black = 0;
 uniform float mask_white = 1;
 
-uniform vec4 base_color : hint_color;
-uniform vec4 top_color : hint_color;
+uniform vec4 base_color : source_color;
+uniform vec4 top_color : source_color;
 uniform sampler2D color_mask;
 
 void vertex() {

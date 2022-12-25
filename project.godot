@@ -14,6 +14,16 @@ _global_script_classes=[{
 "language": &"GDScript",
 "path": "res://addons/gd_scatter/src/core/nodes/GDScatter.gd"
 }, {
+"base": "Node3D",
+"class": &"GDScatterArea",
+"language": &"GDScript",
+"path": "res://addons/gd_scatter/src/core/nodes/GDScatterArea.gd"
+}, {
+"base": "Object",
+"class": &"GDScatterMode",
+"language": &"GDScript",
+"path": "res://addons/gd_scatter/src/core/enums/GDScatterMode.gd"
+}, {
 "base": "MultiMeshInstance3D",
 "class": &"GDScatterMultimesh",
 "language": &"GDScript",
@@ -21,6 +31,8 @@ _global_script_classes=[{
 }]
 _global_script_class_icons={
 "GDScatter": "res://addons/gd_scatter/src/icons/scatter-icon.png",
+"GDScatterArea": "res://addons/gd_scatter/src/icons/scatter-icon.png",
+"GDScatterMode": "",
 "GDScatterMultimesh": "res://addons/gd_scatter/src/icons/scatter-random-icon.png"
 }
 
@@ -28,8 +40,8 @@ _global_script_class_icons={
 
 config/name="GDScatter"
 run/main_scene="res://addons/gd_scatter/src/demo/Test.tscn"
+config/features=PackedStringArray("4.0")
 config/icon="res://addons/gd_scatter/src/icons/scatter-icon.png"
-config/features=PackedStringArray("4.0", "Vulkan Clustered")
 
 [editor_plugins]
 
