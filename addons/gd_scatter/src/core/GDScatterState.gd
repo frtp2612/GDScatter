@@ -21,7 +21,7 @@ var spawning_section = false
 var space_state
 
 var multimesh_settings = {
-	"max_instances": 100000,
+	"max_instances": 10000,
 	"current_instances": 200,
 	"randomized_amount": 20,
 }

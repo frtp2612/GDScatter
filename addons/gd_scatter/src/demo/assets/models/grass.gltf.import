@@ -3,7 +3,7 @@
 importer="scene"
 importer_version=1
 type="PackedScene"
-uid="uid://b63notjfgent8"
+uid="uid://boypth516v56i"
 path="res://.godot/imported/grass.gltf-6a91f48087332c57d6a56f9994c723ef.scn"
 
 [deps]
@@ -27,4 +27,17 @@ animation/import=true
 animation/fps=30
 animation/trimming=false
 import_script/path=""
-_subresources={}
+_subresources={
+"meshes": {
+"grass_Plane058": {
+"generate/lightmap_uv": 0,
+"generate/lods": 0,
+"generate/shadow_meshes": 0,
+"lods/normal_merge_angle": 60.0,
+"lods/normal_split_angle": 25.0,
+"save_to_file/enabled": true,
+"save_to_file/make_streamable": "",
+"save_to_file/path": "res://addons/gd_scatter/src/demo/assets/models/GrassMesh.tres"
+}
+}
+}

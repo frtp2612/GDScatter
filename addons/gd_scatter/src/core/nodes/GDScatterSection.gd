@@ -13,6 +13,7 @@ func set_state(state: GDScatterState) -> void:
 func _enter_tree():
 	var instance_transform
 	if multimesh:
+		print("redrawing")
 		for instance_index in multimesh.visible_instance_count:
 			instance_transform = multimesh.get_instance_transform(instance_index)
 			if instance_transform == Transform3D():
@@ -40,6 +41,7 @@ func add_elements():
 		# this break is necessary to allow the engine to process the change of active multimesh
 		# otherwise it will still detect that the visible instances are exceeding the max instance count
 		# and will add n new multimesh nodes
+	
 
 func remove_elements():
 	for instance_origin in existing_instances_data.keys():
